@@ -1,0 +1,121 @@
+import { offset } from '@/lib/packages';
+import type { Pad, Solid } from '@/lib/types';
+
+export type QFNConfig = {
+  type: 'qfn';
+
+  body: {
+    width: number;
+    length: number;
+    height: number;
+  };
+
+  pad_count: {
+    x: number;
+    y: number;
+  };
+
+  pad: {
+    pitch: number;
+    width: number;
+    length: number;
+
+    exposure: number;
+    thickness: number;
+  };
+
+  epad:
+    | { enabled: false }
+    | {
+        enabled: true;
+        width: number;
+        length: number;
+      };
+};
+
+// default as nordic semiconductor nrf52832
+export const DEFAULT_QFN_CONFIG: QFNConfig = {
+  type: 'qfn',
+
+  body: {
+    width: 6.0,
+    length: 6.0,
+    height: 0.85,
+  },
+
+  pad_count: {
+    x: 12,
+    y: 12,
+  },
+
+  pad: {
+    pitch: 0.4,
+    width: 0.2,
+    length: 0.4,
+
+    exposure: 0.02,
+    thickness: 0.2,
+  },
+
+  epad: {
+    enabled: true,
+    width: 4.6,
+    length: 4.6,
+  },
+};
+
+export function QFNToSolids(config: QFNConfig): Solid[] {
+  const solids: Solid[] = [];
+
+  // Body
+  solids.push({
+    type: 'body',
+    position: [0, 0, config.body.height / 2 + config.pad.exposure],
+    size: [config.body.width, config.body.length, config.body.height],
+  });
+
+  const padBase: Pad = {
+    type: 'pad',
+    position: [0, 0, config.pad.thickness / 2 + config.pad.exposure / 2],
+    size: [0, 0, 0],
+  };
+
+  const padBaseX: Pad = {
+    ...padBase,
+    size: [config.pad.width, config.pad.length + config.pad.exposure, config.pad.thickness + config.pad.exposure],
+  };
+
+  const padBaseY: Pad = {
+    ...padBase,
+    size: [config.pad.length + config.pad.exposure, config.pad.width, config.pad.thickness + config.pad.exposure],
+  };
+
+  const leftPadY = -(config.body.width / 2 - config.pad.length / 2 + config.pad.exposure / 2);
+  const rightPadY = -leftPadY;
+
+  // left and right pads
+  for (let i = 0; i < config.pad_count.x; i++) {
+    const offsetX = (i - (config.pad_count.x - 1) / 2) * config.pad.pitch;
+    solids.push(offset(padBaseX, [offsetX, leftPadY, 0]));
+    solids.push(offset(padBaseX, [offsetX, rightPadY, 0]));
+  }
+
+  const topPadX = -(config.body.length / 2 - config.pad.length / 2 + config.pad.exposure / 2);
+  const bottomPadX = -topPadX;
+
+  // top and bottom pads
+  for (let i = 0; i < config.pad_count.y; i++) {
+    const offsetY = (i - (config.pad_count.y - 1) / 2) * config.pad.pitch;
+    solids.push(offset(padBaseY, [topPadX, offsetY, 0]));
+    solids.push(offset(padBaseY, [bottomPadX, offsetY, 0]));
+  }
+
+  if (config.epad.enabled) {
+    solids.push({
+      ...padBase,
+      size: [config.epad.width, config.epad.length, config.pad.thickness + config.pad.exposure],
+    });
+  }
+
+  return solids;
+}
