@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import QFN from '@/components/controls/QFN.vue';
 import WSON from '@/components/controls/WSON.vue';
-import type { PackageConfig } from '@/lib/packages';
+import { configToFreeCADScript } from '@/lib/freecad';
+import { defaultConfig, type PackageConfig } from '@/lib/packages';
 import { DEFAULT_QFN_CONFIG } from '@/lib/packages/qfn';
 import { DEFAULT_WSON_CONFIG } from '@/lib/packages/wson';
 import { createScene } from '@/lib/three';
@@ -56,6 +57,7 @@ watch(
 type Status = 'default' | 'success' | 'error';
 const copyUrlStatus = ref<Status>('default');
 const copyJsonStatus = ref<Status>('default');
+const copyScriptStatus = ref<Status>('default');
 
 function withStatusReset(action: () => Promise<void>, statusRef: Ref<Status>) {
   return async () => {
@@ -105,6 +107,24 @@ function copyConfigJson() {
   }, copyJsonStatus)();
 }
 
+function copyScript() {
+  withStatusReset(async () => {
+    if (!scene) return;
+
+    const script = configToFreeCADScript(config.value);
+
+    console.info('Copying FreeCAD script to clipboard:', script);
+
+    navigator.clipboard.writeText(script).then(
+      () => {},
+      (err) => {
+        console.error('Could not copy script: ', err);
+        throw err;
+      }
+    );
+  }, copyScriptStatus)();
+}
+
 const importJsonText = ref('');
 const importJsonStatus = ref<Status>('default');
 
@@ -118,6 +138,10 @@ function importJson() {
       throw err;
     }
   }, importJsonStatus)();
+}
+
+function reset() {
+  config.value = defaultConfig(config.value.type);
 }
 </script>
 
@@ -139,6 +163,7 @@ function importJson() {
     <div>
       <button @click="copyConfigUrl" :status="copyUrlStatus">Copy URL</button>
       <button @click="copyConfigJson" :status="copyJsonStatus">Copy JSON</button>
+      <button @click="copyScript" :status="copyScriptStatus">Copy FreeCAD Script</button>
     </div>
 
     <h2>Import</h2>
@@ -149,6 +174,8 @@ function importJson() {
       </label>
       <button @click="importJson" :status="importJsonStatus">Import</button>
     </div>
+
+    <button @click="reset">Reset</button>
   </aside>
 </template>
 

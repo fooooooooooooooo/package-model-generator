@@ -1,7 +1,4 @@
-import type { PackageConfig } from '@/lib/packages';
-import { QFNToSolids } from '@/lib/packages/qfn';
-import { WSONToSolids } from '@/lib/packages/wson';
-import type { Solid } from '@/lib/types';
+import { toSolids, type PackageConfig } from '@/lib/packages';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -104,15 +101,7 @@ function updateModel(scene: THREE.Scene, models: THREE.Object3D[], config: Packa
   models.forEach((model) => scene.remove(model));
   models.length = 0;
 
-  let solids: Solid[] = [];
-  if (config.type === 'wson') {
-    solids = WSONToSolids(config);
-  } else if (config.type === 'qfn') {
-    solids = QFNToSolids(config);
-  } else {
-    console.warn('Unknown package type:', config);
-    return;
-  }
+  const solids = toSolids(config);
 
   const model = new THREE.Group();
 

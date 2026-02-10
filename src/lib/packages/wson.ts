@@ -1,4 +1,4 @@
-import { PAD_EXPOSURE_BOTTOM, PAD_EXPOSURE_SIDES, PAD_THICKNESS, offset } from '@/lib/packages';
+import { offset } from '@/lib/packages';
 import type { Pad, Solid } from '@/lib/types';
 
 export type WSONConfig = {
@@ -16,6 +16,9 @@ export type WSONConfig = {
     pitch: number;
     width: number;
     length: number;
+
+    exposure: number;
+    thickness: number;
   };
 
   epad:
@@ -27,13 +30,13 @@ export type WSONConfig = {
       };
 };
 
-// default as microchip 8L_WSON_5x6_EZX_C04-0452A
+// default as gigadevice GD25QxxxE
 export const DEFAULT_WSON_CONFIG: WSONConfig = {
   type: 'wson',
 
   body: {
-    width: 5.0,
-    length: 6.0,
+    width: 6.0,
+    length: 8.0,
     height: 0.75,
   },
 
@@ -42,15 +45,37 @@ export const DEFAULT_WSON_CONFIG: WSONConfig = {
   pad: {
     pitch: 1.27,
     width: 0.4,
-    length: 0.6,
+    length: 0.5,
+
+    exposure: 0.02,
+    thickness: 0.203,
   },
 
   epad: {
     enabled: true,
-    width: 3.4,
-    length: 4.0,
+    width: 4.3,
+    length: 3.4,
   },
 };
+
+/**
+ * With EPad: `WSON-{padCount}-1EP_{bodyWidth}x{bodyLength}mm_P{padPitch}mm_EP{epadWidth}x{epadLength}mm`
+ *
+ * Without EPad: `WSON-{padCount}_{bodyWidth}x{bodyLength}mm_P{padPitch}mm`
+ *
+ * `WSON-8-1EP_8x6mm_P1.27mm_EP3.4x4.3mm`
+ */
+export function WSONToName(config: WSONConfig): string {
+  const padCount = config.pad_count_per_side * 2;
+  const bodyAndPad = `${config.body.width}x${config.body.length}mm_P${config.pad.pitch}mm`;
+
+  if (config.epad.enabled) {
+    const epad = `EP${config.epad.width}x${config.epad.length}mm`;
+    return `WSON-${padCount}-1EP_${bodyAndPad}_${epad}`;
+  } else {
+    return `WSON-${padCount}_${bodyAndPad}`;
+  }
+}
 
 export function WSONToSolids(config: WSONConfig): Solid[] {
   const solids: Solid[] = [];
@@ -58,14 +83,14 @@ export function WSONToSolids(config: WSONConfig): Solid[] {
   // Body
   solids.push({
     type: 'body',
-    position: [0, 0, config.body.height / 2 + PAD_EXPOSURE_BOTTOM],
+    position: [0, 0, config.body.height / 2 + config.pad.exposure],
     size: [config.body.width, config.body.length, config.body.height],
   });
 
   const padBase: Pad = {
     type: 'pad',
-    position: [0, 0, PAD_THICKNESS / 2],
-    size: [config.pad.width, config.pad.length, PAD_THICKNESS],
+    position: [0, 0, config.pad.thickness / 2 + config.pad.exposure / 2],
+    size: [config.pad.width, config.pad.length + config.pad.exposure, config.pad.thickness + config.pad.exposure],
   };
 
   function padXOffset(i: number) {
@@ -76,8 +101,8 @@ export function WSONToSolids(config: WSONConfig): Solid[] {
 
   // offset pad so that the outer edge is flush with the body edge + pad exposure
   const halfPadLength = config.pad.length / 2;
-  const leftSidePadY = -(config.body.length / 2 - halfPadLength + PAD_EXPOSURE_SIDES);
-  const rightSidePadY = config.body.length / 2 - halfPadLength + PAD_EXPOSURE_SIDES;
+  const leftSidePadY = -(config.body.length / 2 - halfPadLength + config.pad.exposure / 2);
+  const rightSidePadY = config.body.length / 2 - halfPadLength + config.pad.exposure / 2;
 
   // Left side
   for (let i = 0; i < config.pad_count_per_side; i++) {
@@ -93,7 +118,7 @@ export function WSONToSolids(config: WSONConfig): Solid[] {
   if (config.epad.enabled) {
     solids.push({
       ...padBase,
-      size: [config.epad.width, config.epad.length, PAD_THICKNESS],
+      size: [config.epad.width, config.epad.length, config.pad.thickness + config.pad.exposure],
     });
   }
 

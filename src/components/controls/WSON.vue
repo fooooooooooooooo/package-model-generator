@@ -27,6 +27,14 @@ const props = defineProps<{
       <input type="number" step="0.01" min="0" v-model.number="config.pad.pitch" />
     </label>
     <Vec2Input v-model:x="config.pad.width" v-model:y="config.pad.length" :labels="['W', 'L']" />
+    <label class="dynamic-input">
+      <span>Exposure</span>
+      <input type="number" step="0.01" min="0" v-model.number="config.pad.exposure" />
+    </label>
+    <label class="dynamic-input">
+      <span>Thickness</span>
+      <input type="number" step="0.01" min="0" v-model.number="config.pad.thickness" />
+    </label>
 
     <h2>EPAD</h2>
     <label class="input-label">

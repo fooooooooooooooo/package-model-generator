@@ -93,9 +93,13 @@ export function QFNToSolids(config: QFNConfig): Solid[] {
   const leftPadY = -(config.body.width / 2 - config.pad.length / 2 + config.pad.exposure / 2);
   const rightPadY = -leftPadY;
 
+  function padOffsetHorizontal(i: number, count: number) {
+    return (i - (count - 1) / 2) * config.pad.pitch;
+  }
+
   // left and right pads
   for (let i = 0; i < config.pad_count.x; i++) {
-    const offsetX = (i - (config.pad_count.x - 1) / 2) * config.pad.pitch;
+    const offsetX = padOffsetHorizontal(i, config.pad_count.x);
     solids.push(offset(padBaseX, [offsetX, leftPadY, 0]));
     solids.push(offset(padBaseX, [offsetX, rightPadY, 0]));
   }
@@ -105,7 +109,7 @@ export function QFNToSolids(config: QFNConfig): Solid[] {
 
   // top and bottom pads
   for (let i = 0; i < config.pad_count.y; i++) {
-    const offsetY = (i - (config.pad_count.y - 1) / 2) * config.pad.pitch;
+    const offsetY = padOffsetHorizontal(i, config.pad_count.y);
     solids.push(offset(padBaseY, [topPadX, offsetY, 0]));
     solids.push(offset(padBaseY, [bottomPadX, offsetY, 0]));
   }
