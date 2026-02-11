@@ -1,5 +1,5 @@
-import { DEFAULT_QFN_CONFIG, QFNToSolids, type QFNConfig } from '@/lib/packages/qfn';
-import { DEFAULT_WSON_CONFIG, WSONToSolids, type WSONConfig } from '@/lib/packages/wson';
+import { DEFAULT_QFN_CONFIG, QFNToName, QFNToSolids, type QFNConfig } from '@/lib/packages/qfn';
+import { DEFAULT_WSON_CONFIG, WSONToName, WSONToSolids, type WSONConfig } from '@/lib/packages/wson';
 import type { Solid, Vec3 } from '@/lib/types';
 
 export type PackageConfig = QFNConfig | WSONConfig;
@@ -19,6 +19,17 @@ export function toSolids(config: PackageConfig): Solid[] {
       return WSONToSolids(config);
     default:
       return [];
+  }
+}
+
+export function toName(config: PackageConfig): string {
+  switch (config.type) {
+    case 'qfn':
+      return QFNToName(config);
+    case 'wson':
+      return WSONToName(config);
+    default:
+      throw new Error(`Unknown package type: ${config['type']}`);
   }
 }
 

@@ -123,3 +123,22 @@ export function QFNToSolids(config: QFNConfig): Solid[] {
 
   return solids;
 }
+
+/**
+ * With EPad: `QFN-{padCount}-1EP_{bodyWidth}x{bodyLength}mm_P{padPitch}mm_EP{epadWidth}x{epadLength}mm`
+ *
+ * Without EPad: `QFN-{padCount}_{bodyWidth}x{bodyLength}mm_P{padPitch}mm`
+ *
+ * `QFN-44-1EP_6x6mm_P0.4mm_EP4.6x4.6mm`
+ */
+export function QFNToName(config: QFNConfig): string {
+  const padCount = 2 * (config.pad_count.x + config.pad_count.y);
+  const bodyAndPad = `${config.body.width}x${config.body.length}mm_P${config.pad.pitch}mm`;
+
+  if (config.epad.enabled) {
+    const epad = `EP${config.epad.width}x${config.epad.length}mm`;
+    return `QFN-${padCount}-1EP_${bodyAndPad}_${epad}`;
+  } else {
+    return `QFN-${padCount}_${bodyAndPad}`;
+  }
+}

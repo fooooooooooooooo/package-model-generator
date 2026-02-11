@@ -41,17 +41,17 @@ const step = computed(() => props.step ?? 0.1);
 
   .label-x {
     color: oklch(95% 0.16 22);
-    background-color: oklch(60% 0.20 22);
+    background-color: oklch(60% 0.2 22);
   }
 
   .label-y {
     color: oklch(95% 0.15 163);
-    background-color: oklch(60% 0.20 163);
+    background-color: oklch(60% 0.2 163);
   }
 
   .label-z {
     color: oklch(95% 0.14 254);
-    background-color: oklch(60% 0.20 254);
+    background-color: oklch(60% 0.2 254);
   }
 }
 </style>

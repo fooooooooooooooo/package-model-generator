@@ -2,12 +2,12 @@
 import QFN from '@/components/controls/QFN.vue';
 import WSON from '@/components/controls/WSON.vue';
 import { configToFreeCADScript } from '@/lib/freecad';
-import { defaultConfig, type PackageConfig } from '@/lib/packages';
+import { defaultConfig, toName, type PackageConfig } from '@/lib/packages';
 import { DEFAULT_QFN_CONFIG } from '@/lib/packages/qfn';
 import { DEFAULT_WSON_CONFIG } from '@/lib/packages/wson';
 import { createScene } from '@/lib/three';
 import { useLocalStorage } from '@vueuse/core';
-import { onBeforeMount, onMounted, ref, useTemplateRef, watch, type Ref } from 'vue';
+import { computed, onBeforeMount, onMounted, ref, useTemplateRef, watch, type Ref } from 'vue';
 
 const container = useTemplateRef<HTMLDivElement>('container');
 
@@ -143,6 +143,8 @@ function importJson() {
 function reset() {
   config.value = defaultConfig(config.value.type);
 }
+
+const name = computed(() => toName(config.value));
 </script>
 
 <template>
@@ -158,6 +160,8 @@ function reset() {
 
     <WSON v-if="config.type === 'wson'" :config="config" />
     <QFN v-else-if="config.type === 'qfn'" :config="config" />
+
+    <h2>{{ name }}</h2>
 
     <h2>Export</h2>
     <div>
@@ -184,7 +188,7 @@ function reset() {
   position: absolute;
   top: 0;
   right: 0;
-  width: 300px;
+  width: 360px;
   height: 100%;
   background: #121212ee;
   padding: 1rem;

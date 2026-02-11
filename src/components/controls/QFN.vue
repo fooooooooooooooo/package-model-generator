@@ -11,18 +11,22 @@ const props = defineProps<{
 <template>
   <form>
     <h2>Body</h2>
-    <Vec3Input :v-bind="config.body.width" :y="config.body.length" :z="config.body.height" :labels="['W', 'L', 'H']" />
+    <Vec3Input
+      v-model:x="config.body.width"
+      v-model:y="config.body.length"
+      v-model:z="config.body.height"
+      :labels="['W', 'L', 'H']" />
 
     <h2>Pad</h2>
     <label class="input-label">
       <span>Count</span>
-      <Vec2Input :x="config.pad_count.x" :y="config.pad_count.y" :labels="['X', 'Y']" />
+      <Vec2Input v-model:x="config.pad_count.x" v-model:y="config.pad_count.y" :labels="['X', 'Y']" />
     </label>
     <label class="dynamic-input">
       <span>Pitch</span>
       <input type="number" step="0.01" min="0" v-model.number="config.pad.pitch" />
     </label>
-    <Vec2Input :x="config.pad.width" :y="config.pad.length" :labels="['W', 'L']" />
+    <Vec2Input v-model:x="config.pad.width" v-model:y="config.pad.length" :labels="['W', 'L']" />
     <label class="dynamic-input">
       <span>Exposure</span>
       <input type="number" step="0.01" min="0" v-model.number="config.pad.exposure" />
@@ -39,8 +43,8 @@ const props = defineProps<{
     </label>
     <Vec2Input
       v-if="config.epad.enabled"
-      :x="config.epad.width"
-      :y="config.epad.length"
+      v-model:x="config.epad.width"
+      v-model:y="config.epad.length"
       :min="0"
       :labels="['X', 'Y']" />
   </form>

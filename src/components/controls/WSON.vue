@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { WSONConfig } from '@/lib/packages/wson';
 import Vec2Input from '@/components/Vec2Input.vue';
 import Vec3Input from '@/components/Vec3Input.vue';
+import type { WSONConfig } from '@/lib/packages/wson';
 
 const props = defineProps<{
   config: WSONConfig;

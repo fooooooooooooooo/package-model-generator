@@ -1,5 +1,5 @@
 import { BODY_COLOR, PAD_COLOR } from '@/lib/colors';
-import { toSolids, type PackageConfig } from '@/lib/packages';
+import { toName, toSolids, type PackageConfig } from '@/lib/packages';
 import type { Solid } from '@/lib/types';
 
 function color(hex: number): string {
@@ -23,7 +23,7 @@ function color(hex: number): string {
  *  4. Fuse all pad shapes into one "Pads" feature, colored light silver
  *  5. Hide the individual source shapes
  */
-export function solidsToFreeCADScript(solids: Solid[]): string {
+export function solidsToFreeCADScript(name: string, solids: Solid[]): string {
   const lines: string[] = [];
 
   function emit(line = '') {
@@ -36,7 +36,7 @@ export function solidsToFreeCADScript(solids: Solid[]): string {
   emit('import FreeCAD');
   emit('import Part');
   emit('');
-  emit('doc = FreeCAD.newDocument("Package")');
+  emit(`doc = FreeCAD.newDocument("${name}")`);
   emit('');
 
   const bodyNames: string[] = [];
@@ -108,5 +108,5 @@ export function solidsToFreeCADScript(solids: Solid[]): string {
 }
 
 export function configToFreeCADScript(config: PackageConfig): string {
-  return solidsToFreeCADScript(toSolids(config));
+  return solidsToFreeCADScript(toName(config), toSolids(config));
 }

@@ -58,25 +58,6 @@ export const DEFAULT_WSON_CONFIG: WSONConfig = {
   },
 };
 
-/**
- * With EPad: `WSON-{padCount}-1EP_{bodyWidth}x{bodyLength}mm_P{padPitch}mm_EP{epadWidth}x{epadLength}mm`
- *
- * Without EPad: `WSON-{padCount}_{bodyWidth}x{bodyLength}mm_P{padPitch}mm`
- *
- * `WSON-8-1EP_8x6mm_P1.27mm_EP3.4x4.3mm`
- */
-export function WSONToName(config: WSONConfig): string {
-  const padCount = config.pad_count_per_side * 2;
-  const bodyAndPad = `${config.body.width}x${config.body.length}mm_P${config.pad.pitch}mm`;
-
-  if (config.epad.enabled) {
-    const epad = `EP${config.epad.width}x${config.epad.length}mm`;
-    return `WSON-${padCount}-1EP_${bodyAndPad}_${epad}`;
-  } else {
-    return `WSON-${padCount}_${bodyAndPad}`;
-  }
-}
-
 export function WSONToSolids(config: WSONConfig): Solid[] {
   const solids: Solid[] = [];
 
@@ -123,4 +104,23 @@ export function WSONToSolids(config: WSONConfig): Solid[] {
   }
 
   return solids;
+}
+
+/**
+ * With EPad: `WSON-{padCount}-1EP_{bodyWidth}x{bodyLength}mm_P{padPitch}mm_EP{epadWidth}x{epadLength}mm`
+ *
+ * Without EPad: `WSON-{padCount}_{bodyWidth}x{bodyLength}mm_P{padPitch}mm`
+ *
+ * `WSON-8-1EP_8x6mm_P1.27mm_EP3.4x4.3mm`
+ */
+export function WSONToName(config: WSONConfig): string {
+  const padCount = config.pad_count_per_side * 2;
+  const bodyAndPad = `${config.body.width}x${config.body.length}mm_P${config.pad.pitch}mm`;
+
+  if (config.epad.enabled) {
+    const epad = `EP${config.epad.width}x${config.epad.length}mm`;
+    return `WSON-${padCount}-1EP_${bodyAndPad}_${epad}`;
+  } else {
+    return `WSON-${padCount}_${bodyAndPad}`;
+  }
 }
