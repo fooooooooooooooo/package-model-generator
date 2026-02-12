@@ -12,6 +12,7 @@ const props = defineProps<{
   <form>
     <h2>Body</h2>
     <Vec3Input
+      :min="0"
       v-model:x="config.body.width"
       v-model:y="config.body.length"
       v-model:z="config.body.height"
@@ -20,20 +21,20 @@ const props = defineProps<{
     <h2>Pad</h2>
     <label class="dynamic-input">
       <span>Count</span>
-      <input type="number" step="1" min="0" v-model.number="config.pad_count_per_side" />
+      <input type="number" min="0" step="1" v-model.number="config.pad_count_per_side" />
     </label>
     <label class="dynamic-input">
       <span>Pitch</span>
-      <input type="number" step="0.01" min="0" v-model.number="config.pad.pitch" />
+      <input type="number" min="0" step="0.01" v-model.number="config.pad.pitch" />
     </label>
     <Vec2Input v-model:x="config.pad.width" v-model:y="config.pad.length" :labels="['W', 'L']" />
     <label class="dynamic-input">
-      <span>Exposure</span>
-      <input type="number" step="0.01" min="0" v-model.number="config.pad.exposure" />
+      <span>Standoff</span>
+      <input type="number" min="0" step="0.01" v-model.number="config.pad.standoff" />
     </label>
     <label class="dynamic-input">
       <span>Thickness</span>
-      <input type="number" step="0.01" min="0" v-model.number="config.pad.thickness" />
+      <input type="number" min="0" step="0.01" v-model.number="config.pad.thickness" />
     </label>
 
     <h2>EPAD</h2>

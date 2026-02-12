@@ -17,7 +17,7 @@ export type WSONConfig = {
     width: number;
     length: number;
 
-    exposure: number;
+    standoff: number;
     thickness: number;
   };
 
@@ -47,7 +47,7 @@ export const DEFAULT_WSON_CONFIG: WSONConfig = {
     width: 0.4,
     length: 0.5,
 
-    exposure: 0.02,
+    standoff: 0.02,
     thickness: 0.203,
   },
 
@@ -64,14 +64,14 @@ export function WSONToSolids(config: WSONConfig): Solid[] {
   // Body
   solids.push({
     type: 'body',
-    position: [0, 0, config.body.height / 2 + config.pad.exposure],
+    position: [0, 0, config.body.height / 2 + config.pad.standoff],
     size: [config.body.width, config.body.length, config.body.height],
   });
 
   const padBase: Pad = {
     type: 'pad',
-    position: [0, 0, config.pad.thickness / 2 + config.pad.exposure / 2],
-    size: [config.pad.width, config.pad.length + config.pad.exposure, config.pad.thickness + config.pad.exposure],
+    position: [0, 0, config.pad.thickness / 2 + config.pad.standoff / 2],
+    size: [config.pad.width, config.pad.length + config.pad.standoff, config.pad.thickness + config.pad.standoff],
   };
 
   function padXOffset(i: number) {
@@ -82,8 +82,8 @@ export function WSONToSolids(config: WSONConfig): Solid[] {
 
   // offset pad so that the outer edge is flush with the body edge + pad exposure
   const halfPadLength = config.pad.length / 2;
-  const leftSidePadY = -(config.body.length / 2 - halfPadLength + config.pad.exposure / 2);
-  const rightSidePadY = config.body.length / 2 - halfPadLength + config.pad.exposure / 2;
+  const leftSidePadY = -(config.body.length / 2 - halfPadLength + config.pad.standoff / 2);
+  const rightSidePadY = config.body.length / 2 - halfPadLength + config.pad.standoff / 2;
 
   // Left side
   for (let i = 0; i < config.pad_count_per_side; i++) {
@@ -99,7 +99,7 @@ export function WSONToSolids(config: WSONConfig): Solid[] {
   if (config.epad.enabled) {
     solids.push({
       ...padBase,
-      size: [config.epad.width, config.epad.length, config.pad.thickness + config.pad.exposure],
+      size: [config.epad.width, config.epad.length, config.pad.thickness + config.pad.standoff],
     });
   }
 

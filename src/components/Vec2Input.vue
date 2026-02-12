@@ -19,11 +19,11 @@ const step = computed(() => props.step ?? 0.1);
   <div class="vec2-input">
     <label class="input">
       <span class="label-x">{{ props.labels[0] }}</span>
-      <input type="number" :step="step" v-model.number="x" />
+      <input type="number" :min :max :step v-model.number="x" />
     </label>
     <label class="input">
       <span class="label-y">{{ props.labels[1] }}</span>
-      <input type="number" :step="step" v-model.number="y" />
+      <input type="number" :min :max :step v-model.number="y" />
     </label>
   </div>
 </template>

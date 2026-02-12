@@ -20,7 +20,7 @@ export type QFNConfig = {
     width: number;
     length: number;
 
-    exposure: number;
+    standoff: number;
     thickness: number;
   };
 
@@ -53,7 +53,7 @@ export const DEFAULT_QFN_CONFIG: QFNConfig = {
     width: 0.2,
     length: 0.4,
 
-    exposure: 0.02,
+    standoff: 0.02,
     thickness: 0.2,
   },
 
@@ -70,27 +70,27 @@ export function QFNToSolids(config: QFNConfig): Solid[] {
   // Body
   solids.push({
     type: 'body',
-    position: [0, 0, config.body.height / 2 + config.pad.exposure],
+    position: [0, 0, config.body.height / 2 + config.pad.standoff],
     size: [config.body.width, config.body.length, config.body.height],
   });
 
   const padBase: Pad = {
     type: 'pad',
-    position: [0, 0, config.pad.thickness / 2 + config.pad.exposure / 2],
+    position: [0, 0, config.pad.thickness / 2 + config.pad.standoff / 2],
     size: [0, 0, 0],
   };
 
   const padBaseX: Pad = {
     ...padBase,
-    size: [config.pad.width, config.pad.length + config.pad.exposure, config.pad.thickness + config.pad.exposure],
+    size: [config.pad.width, config.pad.length + config.pad.standoff, config.pad.thickness + config.pad.standoff],
   };
 
   const padBaseY: Pad = {
     ...padBase,
-    size: [config.pad.length + config.pad.exposure, config.pad.width, config.pad.thickness + config.pad.exposure],
+    size: [config.pad.length + config.pad.standoff, config.pad.width, config.pad.thickness + config.pad.standoff],
   };
 
-  const leftPadY = -(config.body.width / 2 - config.pad.length / 2 + config.pad.exposure / 2);
+  const leftPadY = -(config.body.width / 2 - config.pad.length / 2 + config.pad.standoff / 2);
   const rightPadY = -leftPadY;
 
   function padOffsetHorizontal(i: number, count: number) {
@@ -104,7 +104,7 @@ export function QFNToSolids(config: QFNConfig): Solid[] {
     solids.push(offset(padBaseX, [offsetX, rightPadY, 0]));
   }
 
-  const topPadX = -(config.body.length / 2 - config.pad.length / 2 + config.pad.exposure / 2);
+  const topPadX = -(config.body.length / 2 - config.pad.length / 2 + config.pad.standoff / 2);
   const bottomPadX = -topPadX;
 
   // top and bottom pads
@@ -117,7 +117,7 @@ export function QFNToSolids(config: QFNConfig): Solid[] {
   if (config.epad.enabled) {
     solids.push({
       ...padBase,
-      size: [config.epad.width, config.epad.length, config.pad.thickness + config.pad.exposure],
+      size: [config.epad.width, config.epad.length, config.pad.thickness + config.pad.standoff],
     });
   }
 

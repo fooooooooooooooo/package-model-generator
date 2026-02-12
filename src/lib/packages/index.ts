@@ -34,12 +34,21 @@ export function toName(config: PackageConfig): string {
 }
 
 export function defaultConfig(type: PackageConfig['type']): PackageConfig {
-  switch (type) {
-    case 'qfn':
-      return DEFAULT_QFN_CONFIG;
-    case 'wson':
-      return DEFAULT_WSON_CONFIG;
-    default:
-      throw new Error(`Unknown package type: ${type}`);
-  }
+  const config = (() => {
+    switch (type) {
+      case 'qfn':
+        return DEFAULT_QFN_CONFIG;
+      case 'wson':
+        return DEFAULT_WSON_CONFIG;
+      default:
+        throw new Error(`Unknown package type: ${type}`);
+    }
+  })();
+
+  return structuredClone(config);
+}
+
+export function configTypeValid(type: string): type is PackageConfig['type'] {
+  const VALID_TYPES: PackageConfig['type'][] = ['qfn', 'wson'];
+  return VALID_TYPES.includes(type as PackageConfig['type']);
 }

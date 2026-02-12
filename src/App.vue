@@ -2,8 +2,7 @@
 import QFN from '@/components/controls/QFN.vue';
 import WSON from '@/components/controls/WSON.vue';
 import { configToFreeCADScript } from '@/lib/freecad';
-import { defaultConfig, toName, type PackageConfig } from '@/lib/packages';
-import { DEFAULT_QFN_CONFIG } from '@/lib/packages/qfn';
+import { configTypeValid, defaultConfig, toName, type PackageConfig } from '@/lib/packages';
 import { DEFAULT_WSON_CONFIG } from '@/lib/packages/wson';
 import { createScene } from '@/lib/three';
 import { useLocalStorage } from '@vueuse/core';
@@ -18,10 +17,8 @@ function onPackageTypeChange(event: Event) {
   const select = event.target as HTMLSelectElement;
   const value = select.value;
 
-  if (value === 'wson') {
-    config.value = DEFAULT_WSON_CONFIG;
-  } else if (value === 'qfn') {
-    config.value = DEFAULT_QFN_CONFIG;
+  if (configTypeValid(value)) {
+    config.value = defaultConfig(value);
   }
 }
 
@@ -32,7 +29,12 @@ onBeforeMount(() => {
   if (configParam) {
     try {
       const decodedConfig = JSON.parse(atob(configParam));
-      config.value = decodedConfig;
+
+      if (configTypeValid(decodedConfig.type)) {
+        config.value = decodedConfig;
+      } else {
+        console.warn('Invalid config type in url, ignoring:', decodedConfig);
+      }
     } catch (error) {
       console.error('Failed to load config from url:', error);
     }
@@ -132,7 +134,12 @@ function importJson() {
   withStatusReset(async () => {
     try {
       const parsedConfig = JSON.parse(importJsonText.value);
-      config.value = parsedConfig;
+      if (configTypeValid(parsedConfig.type)) {
+        config.value = parsedConfig;
+      } else {
+        console.warn('Invalid config type in imported JSON, ignoring:', parsedConfig);
+        throw new Error('Invalid config type');
+      }
     } catch (err) {
       console.error('Failed to import JSON:', err);
       throw err;
@@ -141,7 +148,15 @@ function importJson() {
 }
 
 function reset() {
-  config.value = defaultConfig(config.value.type);
+  console.info('Config before reset:', config.value);
+
+  if (configTypeValid(config.value.type)) {
+    console.info('Resetting config to default for type:', config.value.type);
+    config.value = defaultConfig(config.value.type);
+  } else {
+    console.warn('Invalid config type, resetting to default QFN config:', config.value.type);
+    config.value = defaultConfig('qfn');
+  }
 }
 
 const name = computed(() => toName(config.value));
@@ -153,8 +168,8 @@ const name = computed(() => toName(config.value));
     <label class="input-label">
       <span>Package Type</span>
       <select @change="onPackageTypeChange" :value="config.type">
-        <option value="wson">WSON</option>
         <option value="qfn">QFN</option>
+        <option value="wson">WSON</option>
       </select>
     </label>
 
