@@ -2,6 +2,22 @@ import { toSolids, type PackageConfig } from '@/lib/packages';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
+function lerpLoop(duration: number, onUpdate: (dt: number) => void) {
+  let startTime: number | null = null;
+
+  function step(timestamp: number) {
+    if (!startTime) startTime = timestamp;
+
+    const dt = Math.min((timestamp - startTime) / duration, 1);
+
+    onUpdate(dt);
+
+    if (dt < 1) requestAnimationFrame(step);
+  }
+
+  requestAnimationFrame(step);
+}
+
 export function createScene(container: HTMLDivElement) {
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0x202020);
@@ -28,11 +44,14 @@ export function createScene(container: HTMLDivElement) {
   scene.add(directionalLight);
 
   const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 500);
-  camera.position.set(6, 4, 6);
-  camera.lookAt(0, 0, 0);
+
+  const CAMERA_HOME_POSITION = new THREE.Vector3(6, 4, 6);
+  const CAMERA_HOME_TARGET = new THREE.Vector3(0, 0, 0);
+
+  camera.position.copy(CAMERA_HOME_POSITION);
+  camera.lookAt(CAMERA_HOME_TARGET);
 
   const controls = new OrbitControls(camera, renderer.domElement);
-  // controls.listenToKeyEvents(window);
 
   controls.enableDamping = true;
   controls.dampingFactor = 0.05;
@@ -41,6 +60,13 @@ export function createScene(container: HTMLDivElement) {
 
   controls.minDistance = 1;
   controls.maxDistance = 50;
+
+  function homeCamera() {
+    lerpLoop(1000, (dt) => {
+      controls.target.lerp(CAMERA_HOME_TARGET, dt);
+      camera.position.lerp(CAMERA_HOME_POSITION, dt);
+    });
+  }
 
   function render() {
     renderer.render(scene, camera);
@@ -88,6 +114,7 @@ export function createScene(container: HTMLDivElement) {
     models,
     destroy,
     updateModel: (config: PackageConfig) => updateModel(scene, models, config),
+    homeCamera,
   };
 }
 

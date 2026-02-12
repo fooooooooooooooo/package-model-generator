@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import NumberInput from '@/components/NumberInput.vue';
 
 const props = defineProps<{
   labels: [string, string];
 
+  integer?: boolean;
   min?: number;
   max?: number;
   step?: number;
@@ -11,19 +12,17 @@ const props = defineProps<{
 
 const x = defineModel('x', { type: Number, default: 0 });
 const y = defineModel('y', { type: Number, default: 0 });
-
-const step = computed(() => props.step ?? 0.1);
 </script>
 
 <template>
   <div class="vec2-input">
     <label class="input">
       <span class="label-x">{{ props.labels[0] }}</span>
-      <input type="number" :min :max :step v-model.number="x" />
+      <NumberInput :integer :min :max :step v-model="x" />
     </label>
     <label class="input">
       <span class="label-y">{{ props.labels[1] }}</span>
-      <input type="number" :min :max :step v-model.number="y" />
+      <NumberInput :integer :min :max :step v-model="y" />
     </label>
   </div>
 </template>

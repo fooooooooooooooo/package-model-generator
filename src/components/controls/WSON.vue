@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import NumberInput from '@/components/NumberInput.vue';
 import Vec2Input from '@/components/Vec2Input.vue';
 import Vec3Input from '@/components/Vec3Input.vue';
 import type { WSONConfig } from '@/lib/packages/wson';
@@ -12,29 +13,29 @@ const props = defineProps<{
   <form>
     <h2>Body</h2>
     <Vec3Input
-      :min="0"
       v-model:x="config.body.width"
       v-model:y="config.body.length"
       v-model:z="config.body.height"
-      :labels="['W', 'L', 'H']" />
+      :labels="['W', 'L', 'H']"
+    />
 
     <h2>Pad</h2>
     <label class="dynamic-input">
       <span>Count</span>
-      <input type="number" min="0" step="1" v-model.number="config.pad_count_per_side" />
+      <NumberInput integer v-model="config.pad_count_per_side" />
     </label>
     <label class="dynamic-input">
       <span>Pitch</span>
-      <input type="number" min="0" step="0.01" v-model.number="config.pad.pitch" />
+      <NumberInput v-model="config.pad.pitch" />
     </label>
     <Vec2Input v-model:x="config.pad.width" v-model:y="config.pad.length" :labels="['W', 'L']" />
     <label class="dynamic-input">
       <span>Standoff</span>
-      <input type="number" min="0" step="0.01" v-model.number="config.pad.standoff" />
+      <NumberInput v-model="config.pad.standoff" />
     </label>
     <label class="dynamic-input">
       <span>Thickness</span>
-      <input type="number" min="0" step="0.01" v-model.number="config.pad.thickness" />
+      <NumberInput v-model="config.pad.thickness" />
     </label>
 
     <h2>EPAD</h2>
@@ -46,7 +47,7 @@ const props = defineProps<{
       v-if="config.epad.enabled"
       v-model:x="config.epad.width"
       v-model:y="config.epad.length"
-      :min="0"
-      :labels="['X', 'Y']" />
+      :labels="['X', 'Y']"
+    />
   </form>
 </template>

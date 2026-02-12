@@ -1,28 +1,25 @@
 <script setup lang="ts">
 import QFN from '@/components/controls/QFN.vue';
 import WSON from '@/components/controls/WSON.vue';
+import { useConfig, useHistory } from '@/composables/config';
 import { configToFreeCADScript } from '@/lib/freecad';
-import { configTypeValid, defaultConfig, toName, type PackageConfig } from '@/lib/packages';
+import { configTypeValid, defaultConfig, toName } from '@/lib/packages';
 import { createScene } from '@/lib/three';
-import { useLocalStorage, useMagicKeys, useRefHistory, whenever } from '@vueuse/core';
+import { useMagicKeys, whenever } from '@vueuse/core';
 import { computed, onBeforeMount, onMounted, ref, useTemplateRef, watch, type Ref } from 'vue';
 
-let scene: null | ReturnType<typeof createScene> = null;
+let scene: ReturnType<typeof createScene> | null = null;
 const container = useTemplateRef<HTMLDivElement>('container');
+
+const config = useConfig();
+// init history for undo/redo
+useHistory();
 
 onMounted(() => {
   if (!container.value) return;
   scene = createScene(container.value);
   scene.updateModel(config.value);
 });
-
-const config = useLocalStorage<PackageConfig>('model-generator-package-config', defaultConfig('qfn'));
-
-const { undo, redo } = useRefHistory(config, { deep: true });
-
-const { ctrl_z, ctrl_y } = useMagicKeys();
-whenever(ctrl_z!, undo);
-whenever(ctrl_y!, redo);
 
 function onPackageTypeChange(event: Event) {
   const select = event.target as HTMLSelectElement;
@@ -58,8 +55,11 @@ watch(
     if (!scene) return;
     scene.updateModel(newConfig);
   },
-  { deep: true }
+  { deep: true },
 );
+
+const { home } = useMagicKeys();
+whenever(home!, () => scene && scene.homeCamera());
 
 type Status = 'default' | 'success' | 'error';
 const copyUrlStatus = ref<Status>('default');
@@ -93,7 +93,7 @@ function copyConfigUrl() {
       (err) => {
         console.error('Could not copy URL: ', err);
         throw err;
-      }
+      },
     );
   }, copyUrlStatus)();
 }
@@ -109,7 +109,7 @@ function copyConfigJson() {
       (err) => {
         console.error('Could not copy JSON: ', err);
         throw err;
-      }
+      },
     );
   }, copyJsonStatus)();
 }
@@ -127,7 +127,7 @@ function copyScript() {
       (err) => {
         console.error('Could not copy script: ', err);
         throw err;
-      }
+      },
     );
   }, copyScriptStatus)();
 }
