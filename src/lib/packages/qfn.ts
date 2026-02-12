@@ -90,7 +90,7 @@ export function QFNToSolids(config: QFNConfig): Solid[] {
     size: [config.pad.length + config.pad.standoff, config.pad.width, config.pad.thickness + config.pad.standoff],
   };
 
-  const leftPadY = -(config.body.width / 2 - config.pad.length / 2 + config.pad.standoff / 2);
+  const leftPadY = -(config.body.length / 2 - config.pad.length / 2 + config.pad.standoff / 2);
   const rightPadY = -leftPadY;
 
   function padOffsetHorizontal(i: number, count: number) {
@@ -104,7 +104,7 @@ export function QFNToSolids(config: QFNConfig): Solid[] {
     solids.push(offset(padBaseX, [offsetX, rightPadY, 0]));
   }
 
-  const topPadX = -(config.body.length / 2 - config.pad.length / 2 + config.pad.standoff / 2);
+  const topPadX = -(config.body.width / 2 - config.pad.length / 2 + config.pad.standoff / 2);
   const bottomPadX = -topPadX;
 
   // top and bottom pads
