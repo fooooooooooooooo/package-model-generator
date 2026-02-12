@@ -3,15 +3,26 @@ import QFN from '@/components/controls/QFN.vue';
 import WSON from '@/components/controls/WSON.vue';
 import { configToFreeCADScript } from '@/lib/freecad';
 import { configTypeValid, defaultConfig, toName, type PackageConfig } from '@/lib/packages';
-import { DEFAULT_WSON_CONFIG } from '@/lib/packages/wson';
 import { createScene } from '@/lib/three';
-import { useLocalStorage } from '@vueuse/core';
+import { useLocalStorage, useMagicKeys, useRefHistory, whenever } from '@vueuse/core';
 import { computed, onBeforeMount, onMounted, ref, useTemplateRef, watch, type Ref } from 'vue';
 
+let scene: null | ReturnType<typeof createScene> = null;
 const container = useTemplateRef<HTMLDivElement>('container');
 
-let scene: null | ReturnType<typeof createScene> = null;
-const config = useLocalStorage<PackageConfig>('model-generator-package-config', DEFAULT_WSON_CONFIG);
+onMounted(() => {
+  if (!container.value) return;
+  scene = createScene(container.value);
+  scene.updateModel(config.value);
+});
+
+const config = useLocalStorage<PackageConfig>('model-generator-package-config', defaultConfig('qfn'));
+
+const { undo, redo } = useRefHistory(config, { deep: true });
+
+const { ctrl_z, ctrl_y } = useMagicKeys();
+whenever(ctrl_z!, undo);
+whenever(ctrl_y!, redo);
 
 function onPackageTypeChange(event: Event) {
   const select = event.target as HTMLSelectElement;
@@ -39,12 +50,6 @@ onBeforeMount(() => {
       console.error('Failed to load config from url:', error);
     }
   }
-});
-
-onMounted(() => {
-  if (!container.value) return;
-  scene = createScene(container.value);
-  scene.updateModel(config.value);
 });
 
 watch(

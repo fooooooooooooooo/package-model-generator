@@ -11,17 +11,17 @@
   "dependencies": {
     "@vueuse/core": "^14.2.1",
     "three": "^0.182.0",
-    "vue": "^3.5.25"
+    "vue": "^3.5.28"
   },
   "devDependencies": {
-    "@types/node": "^24.10.1",
-    "@types/three": "^0",
-    "@vitejs/plugin-vue": "^6.0.2",
+    "@types/node": "^24.10.13",
+    "@types/three": "^0.182.0",
+    "@vitejs/plugin-vue": "^6.0.4",
     "@vue/tsconfig": "^0.8.1",
     "typescript": "~5.9.3",
     "vite": "^8.0.0-beta.13",
-    "vue-tsc": "^3.1.5",
-    "wrangler": "^4.64.0"
+    "vue-tsc": "^3.2.4",
+    "wrangler": "^4.65.0"
   },
   "resolutions": {
     "vite": "^8.0.0-beta.13"
